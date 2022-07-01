@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+apply plugin: 'java'
+//apply plugin: 'org.springframework.boot'
+
+group 'com.trecapps.notifications'
+version buildVersion
+
+ext {
+    springbootVersion = '2.5.12'
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar{
+    archiveClassifier=''
+    enabled = true
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'javax.activation:activation:1.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
+
+    implementation "org.springframework.boot:spring-boot-starter:$springbootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-web:$springbootVersion"
+    implementation 'com.azure:azure-storage-blob:+'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+publishing {
+
+    publications {
+        myPublication(MavenPublication) {
+            groupId group
+            artifactId 'trec-notifications'
+            version buildVersion
+            artifact 'build/libs/'.concat(artifactId).concat('-').concat(buildVersion).concat('.jar')
+        }
+    }
+
+    repositories{
+        maven {
+            url azureRepoUrl
+            name 'tcMavenRepo'
+            credentials {
+                username azureRepoUsername
+                password azureRepoPassword
+            }
+        }
+    }
+}
